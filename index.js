@@ -74,11 +74,18 @@ client.on("messageCreate", async (message) => {
   }
 
   // !comunicado → crea un embed con título, texto e imagen
-  if (message.content.startsWith("!comunicado ")) {
+    if (message.content.startsWith("!comunicado ")) {
     const args = message.content.slice(12).split("|");
     const titulo = args[0]?.trim() || "Comunicado";
     const descripcion = args[1]?.trim() || "Sin contenido";
     const imagen = args[2]?.trim() || null;
+
+    // 🗑️ Borra el mensaje original del usuario
+    try {
+      await message.delete();
+    } catch (err) {
+      console.log("⚠️ No se pudo borrar el mensaje:", err.message);
+    }
 
     const embed = new EmbedBuilder()
       .setColor(0x3498db)
@@ -88,6 +95,8 @@ client.on("messageCreate", async (message) => {
       .setTimestamp();
 
     if (imagen) embed.setImage(imagen);
+
+    // 📢 Envía el comunicado
     message.channel.send({ embeds: [embed] });
   }
 });
