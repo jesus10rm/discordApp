@@ -36,6 +36,7 @@ app.listen(3000, () => console.log("🌐 Servidor web keep-alive en puerto 3000"
 // 🔹 Al conectarse el bot
 client.once("ready", () => {
   console.log(`✅ Bot conectado como ${client.user.tag}`);
+  console.log("🕒 Hora local Madrid:", new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" }));
 });
 
 // 🕗 COMUNICADOS AUTOMÁTICOS
@@ -53,7 +54,8 @@ cron.schedule("0 20 * * 3", () => {
 
   canal.send({ content: "@everyone\n\n", embeds: [embed] });
   console.log("📢 Comunicado de miércoles enviado");
-});
+  },
+  { timezone: "Europe/Madrid" });
 
 // Domingo a las 20:00
 cron.schedule("0 20 * * 0", () => {
@@ -68,7 +70,8 @@ cron.schedule("0 20 * * 0", () => {
 
   canal.send({ content: "@everyone\n\n", embeds: [embed] });
   console.log("📢 Comunicado de domingo enviado");
-});
+  },
+  { timezone: "Europe/Madrid" });
 
 // 🎙️ Comandos
 client.on("messageCreate", async (message) => {
