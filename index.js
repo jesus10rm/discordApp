@@ -51,7 +51,7 @@ cron.schedule("0 20 * * 3", () => {
     .setDescription("✨ ¡ Día de paga!! Id entrando para terminar y cerrar vuestros tiempos!! ✨")
     .setTimestamp();
 
-  canal.send({ embeds: [embed] });
+  canal.send({ content: "@everyone\n\n", embeds: [embed] });
   console.log("📢 Comunicado de miércoles enviado");
 });
 
@@ -66,7 +66,7 @@ cron.schedule("0 20 * * 0", () => {
     .setDescription("✨ ¡ Día de paga general ! ✨")
     .setTimestamp();
 
-  canal.send({ embeds: [embed] });
+  canal.send({ content: "@everyone\n\n", embeds: [embed] });
   console.log("📢 Comunicado de domingo enviado");
 });
 
@@ -101,7 +101,7 @@ client.on("messageCreate", async (message) => {
     } catch (err) {
       console.log("⚠️ No se pudo borrar el mensaje:", err.message);
     }
-    message.channel.send(texto);
+    message.channel.send(`@everyone\n\n${texto}`);
   }
 
   // !comunicado → crea un embed con título, texto e imagen
@@ -127,7 +127,7 @@ client.on("messageCreate", async (message) => {
 
     if (imagen) embed.setImage(imagen);
 
-    message.channel.send({ embeds: [embed] });
+    message.channel.send({ content: "@everyone\n\n", embeds: [embed] });
   }
 });
 
