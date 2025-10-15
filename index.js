@@ -77,7 +77,10 @@ client.on("messageCreate", async (message) => {
   const tieneRol = message.member.roles.cache.has(rolPermitido.id);
 
   // ❌ Si el usuario no tiene el rol, ignorar o responder con error opcional
-  if (!tieneRol) return;
+  if (!tieneRol) {
+  return message.reply("🚫 No tienes permiso para usar este comando.")
+  .then(msg => setTimeout(() => msg.delete().catch(() => {}), 5000));
+}
 
   // !say → el bot habla por ti
   if (message.content.startsWith("!say ")) {
