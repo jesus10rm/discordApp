@@ -1,3 +1,11 @@
+// 🚫 Evitar ejecución doble dentro del mismo contenedor (Render bug)
+if (global.hasRun) {
+  console.log("⚠️ Instancia duplicada detectada, deteniendo ejecución.");
+  process.exit(0);
+}
+global.hasRun = true;
+
+
 // 🛡️ Evitar que Render arranque doble instancia (preview o health check)
 if (process.env.RENDER === "true" && process.env.NODE_ENV !== "production") {
   console.log("🛑 Render está iniciando una instancia de preview. Cancelando ejecución...");
