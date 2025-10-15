@@ -10,8 +10,8 @@ const client = new Client({
   ],
 });
 
-const TOKEN =
-  "MTQyODA2MTgyMTcyMTM4MzA0NA.GxdUs9.v4W2cy_9x-Bva3_vklebzTMcWjzFB8zJHpMLCQ";
+//const TOKEN = "MTQyODA2MTgyMTcyMTM4MzA0NA.GxdUs9.v4W2cy_9x-Bva3_vklebzTMcWjzFB8zJHpMLCQ";
+const TOKEN = process.env.TOKEN;
 const ID_CANAL = "703279168175079534";
 
 // 🔹 Keep-alive: pequeño servidor web para mantener Replit activo
