@@ -22,7 +22,7 @@ app.listen(3000, () =>
 );
 
 // 🔹 Al conectarse el bot
-client.once("clientReady", () => {
+client.once("ready", () => {
   console.log(`✅ Bot conectado como ${client.user.tag}`);
 });
 
