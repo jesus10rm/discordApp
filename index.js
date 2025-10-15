@@ -63,6 +63,23 @@ cron.schedule("0 20 * * 0", () => {
 // !say → el bot habla por ti
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
+
+  // ✅ Solo usuarios con el rol "Fundador" pueden usar los comandos
+  const rolPermitido = message.guild.roles.cache.find(
+    (r) => r.name.toLowerCase() === "founder"
+  );
+
+  if (!rolPermitido) {
+    console.log("⚠️ No se encontró el rol 'Fundador' en el servidor.");
+    return;
+  }
+
+  const tieneRol = message.member.roles.cache.has(rolPermitido.id);
+
+  // ❌ Si el usuario no tiene el rol, ignorar o responder con error opcional
+  if (!tieneRol) return;
+
+  // !say → el bot habla por ti
   if (message.content.startsWith("!say ")) {
     const texto = message.content.slice(5);
     try {
@@ -74,7 +91,7 @@ client.on("messageCreate", async (message) => {
   }
 
   // !comunicado → crea un embed con título, texto e imagen
-    if (message.content.startsWith("!comunicado ")) {
+  if (message.content.startsWith("!comunicado ")) {
     const args = message.content.slice(12).split("|");
     const titulo = args[0]?.trim() || "Comunicado";
     const descripcion = args[1]?.trim() || "Sin contenido";
