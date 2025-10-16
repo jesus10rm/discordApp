@@ -132,59 +132,92 @@ client.on("messageCreate", async (message) => {
 
     message.channel.send({ content: "@everyone\n\n", embeds: [embed] });
   }
-  // 🎯 !rol → Permite al Director de Eventos asignar roles de su área
-if (message.content.startsWith("!rol ")) {
-  // Solo el Director de Eventos puede usar este comando
+// 🎯 Gestión de roles de Eventos (dar y remover)
+if (message.content.startsWith("!rol ") || message.content.startsWith("!removerol ")) {
+  // Elimina siempre el mensaje original del usuario
+  try { await message.delete(); } catch (err) {}
+
+  const comando = message.content.startsWith("!rol ") ? "asignar" : "remover";
+
+  // 🔐 Solo el Director de Eventos puede usarlo
   const rolDirector = message.guild.roles.cache.find(
     (r) => r.name.toLowerCase() === "director de eventos"
   );
 
-  if (!rolDirector) {
-    return message.reply("⚠️ No se encontró el rol 'Director de Eventos' en el servidor.");
-  }
+  if (!rolDirector) return;
 
   if (!message.member.roles.cache.has(rolDirector.id)) {
-    return message.reply("🚫 No tienes permiso para usar este comando.");
+    return message.channel.send("🚫 No tienes permiso para usar este comando.")
+      .then(msg => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
 
-  // Argumentos: !rol @usuario NombreRol
+  // 📍 Solo puede usarse en el canal de gestión de roles
+  const canalPermitido = "1428353135017070652"; // ID del canal ┃⚠️┃ᴇᴘ-ɢᴇsᴛɪᴏɴ-ʀᴏʟᴇs
+  if (message.channel.id !== canalPermitido) {
+    return message.channel.send("🚫 Este comando solo puede usarse en el canal de gestión de roles.")
+      .then(msg => setTimeout(() => msg.delete().catch(() => {}), 5000));
+  }
+
+  // Procesar argumentos
   const args = message.content.split(" ").slice(1);
-  const miembroMencionado = message.mentions.members.first();
+  const miembro = message.mentions.members.first();
   const nombreRol = args.slice(1).join(" ").trim();
 
-  if (!miembroMencionado || !nombreRol) {
-    return message.reply("❗ Uso correcto: `!rol @usuario Nombre del Rol`");
+  if (!miembro || !nombreRol) {
+    return message.channel.send(`❗ Uso correcto: \`!${comando} @usuario Nombre del Rol\``)
+      .then(msg => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
 
-  // Lista blanca de roles que puede asignar
+  // Lista blanca de roles que puede gestionar
   const rolesPermitidos = [
     "SubDirector de Eventos",
     "Coordinador de Eventos",
     "Planeador de Eventos",
   ];
 
-  // Verificar si el rol existe y está permitido
-  const rolAsignar = message.guild.roles.cache.find(
+  const rol = message.guild.roles.cache.find(
     (r) => r.name.toLowerCase() === nombreRol.toLowerCase()
   );
 
-  if (!rolAsignar) {
-    return message.reply("⚠️ Ese rol no existe.");
+  if (!rol || !rolesPermitidos.some(r => r.toLowerCase() === nombreRol.toLowerCase())) {
+    return message.channel.send("🚫 No puedes gestionar ese rol.")
+      .then(msg => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
 
-  if (!rolesPermitidos.some((rol) => rol.toLowerCase() === nombreRol.toLowerCase())) {
-    return message.reply("🚫 No puedes asignar ese rol.");
-  }
-
-  // Asignar el rol
+  // Ejecutar acción
   try {
-    await miembroMencionado.roles.add(rolAsignar);
-    message.channel.send(
-      `✅ ${miembroMencionado} ahora tiene el rol **${rolAsignar.name}** asignado.`
-    );
+    if (comando === "asignar") {
+      await miembro.roles.add(rol);
+      const embed = new EmbedBuilder()
+        .setColor(0x2ecc71)
+        .setTitle("✅ Rol asignado correctamente")
+        .setDescription(`${miembro} ahora tiene el rol **${rol.name}**.`)
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] })
+        .then(msg => setTimeout(() => msg.delete().catch(() => {}), 7000));
+    } else {
+      await miembro.roles.remove(rol);
+      const embed = new EmbedBuilder()
+        .setColor(0xe74c3c)
+        .setTitle("🗑️ Rol removido correctamente")
+        .setDescription(`${miembro} ya no tiene el rol **${rol.name}**.`)
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] })
+        .then(msg => setTimeout(() => msg.delete().catch(() => {}), 7000));
+    }
+
+    // 📜 Registrar acción en logs (si existe canal logs-bot)
+    const logChannel = message.guild.channels.cache.find(c => c.name === "logs-bot");
+    if (logChannel) {
+      logChannel.send(`📝 **${message.author.tag}** ha ${comando === "asignar" ? "asignado" : "removido"} el rol **${rol.name}** a **${miembro.user.tag}**.`);
+    }
+
   } catch (err) {
-    console.error("❌ Error al asignar rol:", err);
-    message.reply("⚠️ No se pudo asignar el rol. Verifica permisos del bot.");
+    console.error("❌ Error en comando de roles:", err);
+    message.channel.send("⚠️ No se pudo completar la acción. Verifica permisos del bot.")
+      .then(msg => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
 }
 
