@@ -129,136 +129,112 @@ client.on("messageCreate", async (message) => {
     }
   }
 
-  // ===============================
-  // 🧩 BLOQUE 2: DIRECTOR DE EVENTOS
-  // ===============================
-  if (
-    message.content.startsWith("!rol ") ||
-    message.content.startsWith("!removerol ") ||
-    message.content === "!roles"
-  ) {
-    try { await message.delete(); } catch (err) {}
+ // ===============================
+// 🧩 BLOQUE 2: DIRECTOR DE EVENTOS
+// ===============================
+if (
+  message.content.startsWith("!rol ") ||
+  message.content.startsWith("!removerol ") ||
+  message.content === "!roles"
+) {
+  try { await message.delete(); } catch (err) {}
 
-    // 🔐 Verificar rol del Director de Eventos
-    const rolDirector = message.guild.roles.cache.find(
-      (r) => r.name.toLowerCase() === "director de eventos"
-    );
+  // 🔐 Verificar rol del Director de Eventos
+  const rolDirector = message.guild.roles.cache.find(
+    (r) => r.name.toLowerCase() === "director de eventos"
+  );
 
-    if (!rolDirector || !message.member.roles.cache.has(rolDirector.id)) {
-      return message.channel.send("🚫 No tienes permiso para usar este comando.")
-        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
-    }
+  if (!rolDirector || !message.member.roles.cache.has(rolDirector.id)) {
+    return message.channel.send("🚫 No tienes permiso para usar este comando.")
+      .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
+  }
 
-    // 📍 Solo canal permitido
-    const canalPermitido = "1428353135017070652"; // ID ┃⚠️┃ᴇᴘ-ɢᴇsᴛɪᴏɴ-ʀᴏʟᴇs
-    if (message.channel.id !== canalPermitido) {
-      return message.channel.send("🚫 Este comando solo puede usarse en el canal de gestión de roles.")
-        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
-    }
+  // 📍 Solo canal permitido
+  const canalPermitido = "1428353135017070652"; // ID ┃⚠️┃ᴇᴘ-ɢᴇsᴛɪᴏɴ-ʀᴏʟᴇs
+  if (message.channel.id !== canalPermitido) {
+    return message.channel.send("🚫 Este comando solo puede usarse en el canal de gestión de roles.")
+      .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
+  }
 
-    // 🕒 Cooldown
-    if (cooldown.has(message.author.id)) {
-      return message.channel.send("⏳ Espera unos segundos antes de usar este comando de nuevo.")
-        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
-    }
-    cooldown.add(message.author.id);
-    setTimeout(() => cooldown.delete(message.author.id), 5000);
+  // 🕒 Cooldown
+  if (cooldown.has(message.author.id)) {
+    return message.channel.send("⏳ Espera unos segundos antes de usar este comando de nuevo.")
+      .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
+  }
+  cooldown.add(message.author.id);
+  setTimeout(() => cooldown.delete(message.author.id), 5000);
 
-    // 📋 Lista blanca de roles de eventos
-    const rolesPermitidos = [
-      "SubDirector de Eventos",
-      "Coordinador de Eventos",
-      "Planeador de Eventos",
-    ];
+  // 📋 Lista blanca de roles de eventos
+  const rolesPermitidos = [
+    "SubDirector de Eventos",
+    "Coordinador de Eventos",
+    "Planeador de Eventos",
+  ];
 
-    // 🔹 Mostrar roles disponibles
-    if (message.content === "!roles") {
+  // 🔹 Mostrar roles disponibles
+  if (message.content === "!roles") {
+    const embed = new EmbedBuilder()
+      .setColor(0x3498db)
+      .setTitle("🎯 Roles disponibles de Eventos")
+      .setDescription(rolesPermitidos.map((r) => `• **${r}**`).join("\n"))
+      .setFooter({ text: "Usa !rol o !removerol para asignar o quitar un rol" })
+      .setTimestamp();
+
+    return message.channel.send({ embeds: [embed] })
+      .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 10000));
+  }
+
+  // 🧩 Si es !rol o !removerol
+  const comando = message.content.startsWith("!rol ") ? "asignar" : "remover";
+  const args = message.content.split(" ").slice(1);
+  const miembro = message.mentions.members.first();
+  const nombreRol = args.slice(1).join(" ").trim();
+
+  if (!miembro || !nombreRol) {
+    return message.channel.send(`❗ Uso correcto: \`!${comando} @usuario Nombre del Rol\``)
+      .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
+  }
+
+  const rol = message.guild.roles.cache.find(
+    (r) => r.name.toLowerCase() === nombreRol.toLowerCase()
+  );
+
+  if (!rol || !rolesPermitidos.some((r) => r.toLowerCase() === nombreRol.toLowerCase())) {
+    return message.channel.send("🚫 No puedes gestionar ese rol.")
+      .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
+  }
+
+  // ⚡ Asignar o remover directamente
+  try {
+    if (comando === "asignar") {
+      await miembro.roles.add(rol);
       const embed = new EmbedBuilder()
-        .setColor(0x3498db)
-        .setTitle("🎯 Roles disponibles de Eventos")
-        .setDescription(rolesPermitidos.map((r) => `• **${r}**`).join("\n"))
-        .setFooter({ text: "Usa !rol o !removerol para asignar o quitar un rol" })
+        .setColor(0x2ecc71)
+        .setTitle("✅ Rol asignado correctamente")
+        .setDescription(`${miembro} ahora tiene el rol **${rol.name}**.`)
+        .setFooter({ text: "Sistema de Gestión de Roles EP" })
         .setTimestamp();
 
-      return message.channel.send({ embeds: [embed] })
-        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 10000));
+      message.channel.send({ embeds: [embed] })
+        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 7000));
+    } else {
+      await miembro.roles.remove(rol);
+      const embed = new EmbedBuilder()
+        .setColor(0xe74c3c)
+        .setTitle("🗑️ Rol removido correctamente")
+        .setDescription(`${miembro} ya no tiene el rol **${rol.name}**.`)
+        .setFooter({ text: "Sistema de Gestión de Roles EP" })
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] })
+        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 7000));
     }
-
-    // 🧩 Si es !rol o !removerol
-    const comando = message.content.startsWith("!rol ") ? "asignar" : "remover";
-    const args = message.content.split(" ").slice(1);
-    const miembro = message.mentions.members.first();
-    const nombreRol = args.slice(1).join(" ").trim();
-
-    if (!miembro || !nombreRol) {
-      return message.channel.send(`❗ Uso correcto: \`!${comando} @usuario Nombre del Rol\``)
-        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
-    }
-
-    const rol = message.guild.roles.cache.find(
-      (r) => r.name.toLowerCase() === nombreRol.toLowerCase()
-    );
-
-    if (!rol || !rolesPermitidos.some((r) => r.toLowerCase() === nombreRol.toLowerCase())) {
-      return message.channel.send("🚫 No puedes gestionar ese rol.")
-        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
-    }
-
-    // 🧠 Confirmación con reacción ✅
-    const confirmEmbed = new EmbedBuilder()
-      .setColor(comando === "asignar" ? 0x2ecc71 : 0xe74c3c)
-      .setTitle(comando === "asignar" ? "Asignar Rol" : "Remover Rol")
-      .setDescription(
-        `¿Confirmas ${comando === "asignar" ? "asignar" : "remover"} el rol **${rol.name}** a ${miembro}?`
-      )
-      .setFooter({ text: "Reacciona con ✅ para confirmar. (15s)" });
-
-    const confirmMsg = await message.channel.send({ embeds: [confirmEmbed] });
-    await confirmMsg.react("✅");
-
-    try {
-      const filter = (reaction, user) =>
-        reaction.emoji.name === "✅" && user.id === message.author.id;
-      const collected = await confirmMsg.awaitReactions({ filter, max: 1, time: 15000 });
-
-      if (collected.size === 0) {
-        await confirmMsg.delete().catch(() => {});
-        return message.channel.send("⏰ Tiempo agotado, acción cancelada.")
-          .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
-      }
-
-      // Ejecutar acción confirmada
-      if (comando === "asignar") {
-        await miembro.roles.add(rol);
-        const embed = new EmbedBuilder()
-          .setColor(0x2ecc71)
-          .setTitle("✅ Rol asignado correctamente")
-          .setDescription(`${miembro} ahora tiene el rol **${rol.name}**.`)
-          .setFooter({ text: "Sistema de Gestión de Roles EP" })
-          .setTimestamp();
-
-        message.channel.send({ embeds: [embed] })
-          .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 7000));
-      } else {
-        await miembro.roles.remove(rol);
-        const embed = new EmbedBuilder()
-          .setColor(0xe74c3c)
-          .setTitle("🗑️ Rol removido correctamente")
-          .setDescription(`${miembro} ya no tiene el rol **${rol.name}**.`)
-          .setFooter({ text: "Sistema de Gestión de Roles EP" })
-          .setTimestamp();
-
-        message.channel.send({ embeds: [embed] })
-          .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 7000));
-      }
-
-      await confirmMsg.delete().catch(() => {});
-    } catch (err) {
-      console.error("❌ Error en comando de roles:", err);
-      message.channel.send("⚠️ No se pudo completar la acción. Verifica permisos del bot.")
-        .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
-    }
+  } catch (err) {
+    console.error("❌ Error en comando de roles:", err);
+    message.channel.send("⚠️ No se pudo completar la acción. Verifica permisos del bot.")
+      .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
+}
 });
 
 // 🧩 Verificación del token antes de iniciar
