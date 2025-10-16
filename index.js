@@ -185,7 +185,7 @@ if (
   }
 
   // 🧩 Si es !rol o !removerol
-  const comando = message.content.startsWith("!rol ") ? "asignar" : "remover";
+  const comando = message.content.startsWith("!rol ") ? "rol" : "removerol";
   const args = message.content.split(" ").slice(1);
   const miembro = message.mentions.members.first();
   const nombreRol = args.slice(1).join(" ").trim();
