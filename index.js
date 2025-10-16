@@ -175,7 +175,6 @@ client.on("messageCreate", async (message) => {
 
     // 📋 Lista blanca de roles de eventos
     const rolesPermitidos = [
-      "SubDirector de Eventos",
       "Coordinador de Eventos",
       "Planeador de Eventos",
     ];
