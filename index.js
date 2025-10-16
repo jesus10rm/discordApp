@@ -129,7 +129,7 @@ client.on("messageCreate", async (message) => {
     }
   }
 
- // ===============================
+// ===============================
 // 🧩 BLOQUE 2: DIRECTOR DE EVENTOS
 // ===============================
 if (
@@ -180,18 +180,23 @@ if (
       .setFooter({ text: "Usa !rol o !removerol para asignar o quitar un rol" })
       .setTimestamp();
 
-    return message.channel.send({ embeds: [embed] })
+    await message.channel.send({ embeds: [embed] })
       .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 10000));
+
+    return; // 🧠 Evita que se siga ejecutando el resto del bloque
   }
 
   // 🧩 Si es !rol o !removerol
-  const comando = message.content.startsWith("!rol ") ? "rol" : "removerol";
+  const esAsignar = message.content.toLowerCase().startsWith("!rol ");
+  const action = esAsignar ? "asignar" : "remover";      // para la lógica
+  const comandoStr = esAsignar ? "!rol" : "!removerol";  // para mostrar al usuario
+
   const args = message.content.split(" ").slice(1);
   const miembro = message.mentions.members.first();
   const nombreRol = args.slice(1).join(" ").trim();
 
   if (!miembro || !nombreRol) {
-    return message.channel.send(`❗ Uso correcto: \`!${comando} @usuario Nombre del Rol\``)
+    return message.channel.send(`❗ Uso correcto: \`${comandoStr} @usuario Nombre del Rol\``)
       .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
 
@@ -206,7 +211,7 @@ if (
 
   // ⚡ Asignar o remover directamente
   try {
-    if (comando === "asignar") {
+    if (action === "asignar") {
       await miembro.roles.add(rol);
       const embed = new EmbedBuilder()
         .setColor(0x2ecc71)
