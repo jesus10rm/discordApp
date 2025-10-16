@@ -177,6 +177,7 @@ client.on("messageCreate", async (message) => {
     const rolesPermitidos = [
       "Coordinador de Eventos",
       "Planeador de Eventos",
+      "Reportero",
     ];
 
     // 🔹 Mostrar roles disponibles
