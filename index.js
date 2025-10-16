@@ -132,6 +132,62 @@ client.on("messageCreate", async (message) => {
 
     message.channel.send({ content: "@everyone\n\n", embeds: [embed] });
   }
+  // 🎯 !rol → Permite al Director de Eventos asignar roles de su área
+if (message.content.startsWith("!rol ")) {
+  // Solo el Director de Eventos puede usar este comando
+  const rolDirector = message.guild.roles.cache.find(
+    (r) => r.name.toLowerCase() === "director de eventos"
+  );
+
+  if (!rolDirector) {
+    return message.reply("⚠️ No se encontró el rol 'Director de Eventos' en el servidor.");
+  }
+
+  if (!message.member.roles.cache.has(rolDirector.id)) {
+    return message.reply("🚫 No tienes permiso para usar este comando.");
+  }
+
+  // Argumentos: !rol @usuario NombreRol
+  const args = message.content.split(" ").slice(1);
+  const miembroMencionado = message.mentions.members.first();
+  const nombreRol = args.slice(1).join(" ").trim();
+
+  if (!miembroMencionado || !nombreRol) {
+    return message.reply("❗ Uso correcto: `!rol @usuario Nombre del Rol`");
+  }
+
+  // Lista blanca de roles que puede asignar
+  const rolesPermitidos = [
+    "SubDirector de Eventos",
+    "Coordinador de Eventos",
+    "Planeador de Eventos",
+  ];
+
+  // Verificar si el rol existe y está permitido
+  const rolAsignar = message.guild.roles.cache.find(
+    (r) => r.name.toLowerCase() === nombreRol.toLowerCase()
+  );
+
+  if (!rolAsignar) {
+    return message.reply("⚠️ Ese rol no existe.");
+  }
+
+  if (!rolesPermitidos.some((rol) => rol.toLowerCase() === nombreRol.toLowerCase())) {
+    return message.reply("🚫 No puedes asignar ese rol.");
+  }
+
+  // Asignar el rol
+  try {
+    await miembroMencionado.roles.add(rolAsignar);
+    message.channel.send(
+      `✅ ${miembroMencionado} ahora tiene el rol **${rolAsignar.name}** asignado.`
+    );
+  } catch (err) {
+    console.error("❌ Error al asignar rol:", err);
+    message.reply("⚠️ No se pudo asignar el rol. Verifica permisos del bot.");
+  }
+}
+
 });
 
 // 🧩 Verificación del token antes de iniciar
