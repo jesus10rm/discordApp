@@ -159,7 +159,7 @@ client.on("messageCreate", async (message) => {
     }
 
     // 📍 Solo canal permitido
-    const canalPermitido = "1428329761821687878"; // ID ┃🌍┃ᴇᴘ-ɢᴇɴᴇʀᴀʟ
+    const canalPermitido = "1428366292913750146"; // ID ┃🏵️┃ɢᴇsᴛɪᴏɴ-ʀᴏʟᴇs
     if (message.channel.id !== canalPermitido) {
       return message.channel.send("🚫 Este comando solo puede usarse en el canal de gestión de roles.")
         .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
