@@ -288,8 +288,8 @@ if (
   // 📋 Lista blanca de roles de RRHH (por nombre)
   const rolesPermitidosRRHH = [
     "Coordinador de RRHH",
-    "Formación de RRHH",
-    "Control de RRHH",
+    "Formación [RRHH]",
+    "Control [RRHH]",
   ];
 
   // 🔹 Mostrar roles disponibles
