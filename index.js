@@ -139,7 +139,7 @@ client.on("messageCreate", async (message) => {
   }
 
 // ===============================
-// 🧩 BLOQUE 2: DIRECTOR DE EVENTOS (actualizado con IDs)
+// 🧩 BLOQUE 2: DIRECTOR DE EVENTOS (por NOMBRE)
 // ===============================
 if (
   message.content.startsWith("!rol ") ||
@@ -148,15 +148,17 @@ if (
 ) {
   try { await message.delete(); } catch (err) {}
 
-  // 🔐 Verificar rol del Director de Eventos (por ID)
-  const ID_ROL_DIRECTOR = "1428163657883324447"; // Director de Eventos
+  // 🔐 Verificar rol del Director de Eventos (por nombre)
+  const rolDirectorEventos = message.guild.roles.cache.find(
+    (r) => r.name.toLowerCase() === "director de eventos"
+  );
 
-  if (!message.member.roles.cache.has(ID_ROL_DIRECTOR)) {
+  if (!rolDirectorEventos || !message.member.roles.cache.has(rolDirectorEventos.id)) {
     return message.channel.send("🚫 No tienes permiso para usar este comando.")
       .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
 
-  // 📍 Solo canal permitido
+  // 📍 Solo canal permitido (puedes dejarlo por ID o también buscarlo por nombre)
   const canalPermitido = "1428366292913750146"; // ID ┃🏵️┃ɢᴇsᴛɪᴏɴ-ʀᴏʟᴇs
   if (message.channel.id !== canalPermitido) {
     return message.channel.send("🚫 Este comando solo puede usarse en el canal de gestión de roles.")
@@ -171,11 +173,11 @@ if (
   cooldown.add(message.author.id);
   setTimeout(() => cooldown.delete(message.author.id), 5000);
 
-  // 📋 Lista blanca de roles de eventos (por ID)
+  // 📋 Lista blanca de roles de eventos (por nombre)
   const rolesPermitidos = [
-    "1428164112894005328", // Coordinador de Eventos
-    "1428164396668031047", // Planeador de Eventos
-    "1428524653114294333", // Reportero
+    "Coordinador de Eventos",
+    "Planeador de Eventos",
+    "Reportero",
   ];
 
   // 🔹 Mostrar roles disponibles
@@ -183,13 +185,7 @@ if (
     const embed = new EmbedBuilder()
       .setColor(0x3498db)
       .setTitle("🎯 Roles disponibles de Eventos")
-      .setDescription(
-        [
-          "• **Coordinador de Eventos**",
-          "• **Planeador de Eventos**",
-          "• **Reportero**",
-        ].join("\n")
-      )
+      .setDescription(rolesPermitidos.map((r) => `• **${r}**`).join("\n"))
       .setFooter({ text: "Usa !rol o !removerol para asignar o quitar un rol" })
       .setTimestamp();
 
@@ -217,7 +213,7 @@ if (
     (r) => r.name.toLowerCase() === nombreRol.toLowerCase()
   );
 
-  if (!rol || !rolesPermitidos.includes(rol.id)) {
+  if (!rol || !rolesPermitidos.some((r) => r.toLowerCase() === nombreRol.toLowerCase())) {
     return message.channel.send("🚫 No puedes gestionar ese rol.")
       .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
@@ -255,7 +251,7 @@ if (
 }
 
 // ===============================
-// 🧩 BLOQUE 3: DIRECTOR DE RRHH
+// 🧩 BLOQUE 3: DIRECTOR DE RRHH (por NOMBRE)
 // ===============================
 if (
   message.content.startsWith("!rolrrhh ") ||
@@ -264,10 +260,12 @@ if (
 ) {
   try { await message.delete(); } catch (err) {}
 
-  // 🔐 Verificar rol del Director de RRHH (por ID)
-  const ID_ROL_DIRECTOR_RRHH = "1429147083511824574";
+  // 🔐 Verificar rol del Director de RRHH (por nombre)
+  const rolDirectorRRHH = message.guild.roles.cache.find(
+    (r) => r.name.toLowerCase() === "director de rrhh"
+  );
 
-  if (!message.member.roles.cache.has(ID_ROL_DIRECTOR_RRHH)) {
+  if (!rolDirectorRRHH || !message.member.roles.cache.has(rolDirectorRRHH.id)) {
     return message.channel.send("🚫 No tienes permiso para usar este comando.")
       .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
@@ -287,11 +285,11 @@ if (
   cooldown.add(message.author.id);
   setTimeout(() => cooldown.delete(message.author.id), 5000);
 
-  // 📋 Lista blanca de roles de RRHH (por ID)
+  // 📋 Lista blanca de roles de RRHH (por nombre)
   const rolesPermitidosRRHH = [
-    "1429147401855303851", // Coordinador de RRHH
-    "1429147767540027433", // Formación de RRHH
-    "1429148156620177408", // Control de RRHH
+    "Coordinador de RRHH",
+    "Formación de RRHH",
+    "Control de RRHH",
   ];
 
   // 🔹 Mostrar roles disponibles
@@ -299,13 +297,7 @@ if (
     const embed = new EmbedBuilder()
       .setColor(0x1abc9c)
       .setTitle("👥 Roles disponibles de RRHH")
-      .setDescription(
-        [
-          "• **Coordinador de RRHH**",
-          "• **Formación de RRHH**",
-          "• **Control de RRHH**",
-        ].join("\n")
-      )
+      .setDescription(rolesPermitidosRRHH.map((r) => `• **${r}**`).join("\n"))
       .setFooter({ text: "Usa !rolrrhh o !removerolrrhh para asignar o quitar un rol" })
       .setTimestamp();
 
@@ -333,7 +325,7 @@ if (
     (r) => r.name.toLowerCase() === nombreRol.toLowerCase()
   );
 
-  if (!rol || !rolesPermitidosRRHH.includes(rol.id)) {
+  if (!rol || !rolesPermitidosRRHH.some((r) => r.toLowerCase() === nombreRol.toLowerCase())) {
     return message.channel.send("🚫 No puedes gestionar ese rol.")
       .then((msg) => setTimeout(() => msg.delete().catch(() => {}), 5000));
   }
